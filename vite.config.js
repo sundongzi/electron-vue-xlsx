@@ -2,7 +2,9 @@ const Path = require('path');
 const vuePlugin = require('@vitejs/plugin-vue')
 
 const { defineConfig } = require('vite');
-
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 /**
  * https://vitejs.dev/config
  */
@@ -17,7 +19,13 @@ const config = defineConfig({
         outDir: Path.join(__dirname, 'build', 'renderer'),
         emptyOutDir: true,
     },
-    plugins: [vuePlugin()],
+    plugins: [vuePlugin(),
+       AutoImport({
+        resolvers: [ElementPlusResolver()],
+      }),
+      Components({
+        resolvers: [ElementPlusResolver()],
+      })],
 });
 
 module.exports = config;
