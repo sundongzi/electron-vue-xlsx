@@ -114,7 +114,7 @@ const uploadScoringFile = async (e) => {
   const worksheet = workbook.getWorksheet('1')
   
   for (let [key, value] of Object.entries(info.value.packageData)) {
-    const newWorksheet = workbook.addWorksheet(`1-${key}`);
+    const newWorksheet = workbook.addWorksheet(key);
     worksheet?.eachRow({ includeEmpty: true }, function(row, rowNumber) {
       // const { number } = worksheet.lastRow 
       row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
@@ -135,10 +135,7 @@ const uploadScoringFile = async (e) => {
           newRow.height = 30
           newRow.alignment = { horizontal: 'left' }
           const cell2 = newRow.getCell(1)
-          cell2.value = `项目名称：${info.value.projectName}\n项目编号：${info.value.projectCode}`
-          // cell2.style = {
-
-          // }
+          cell2.value = `项目名称：${info.value.projectName}\n项目编号：${info.value.projectCode}-${key}`
         }
         handleRow({ 
           worksheet: newWorksheet, 
