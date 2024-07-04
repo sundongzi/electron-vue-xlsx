@@ -69,6 +69,7 @@ const uploadFile = async (e) => {
   info = ref({
     ...defaultInfo
   })
+  if (!e.target.files[0]) return
   const data = await e.target.files[0].arrayBuffer()
   const workbook = new Excel.Workbook()
   await workbook.xlsx.load(data)
@@ -94,24 +95,28 @@ const uploadFile = async (e) => {
       
     }
   });
-  console.log('info.valueinfo.value', info.value)
+  if (templateFileData.value) {
+    uploadScoringFile()
+  }
 }
 const getProjectInfo = (value) => {
   const nameRegex = /.*(?=（[^（]*$)/
   const codeRegex = /（([^（）]*)）[^（）]*$/
   const projectName = value.match(nameRegex)[0]
   const projectCode = value.match(codeRegex)[1]
-  console.log('matches', projectName, projectCode)
   return {
     projectName,
     projectCode
   }
 }
 // 读取评分表模板
+const templateFileData = ref(null)
 const uploadScoringFile = async (e) => {
-  const data = await e.target.files[0].arrayBuffer()
+  if (!templateFileData.value) {
+    templateFileData.value = await e.target.files[0].arrayBuffer()
+  }
   const workbook = new Excel.Workbook()
-  await workbook.xlsx.load(data)
+  await workbook.xlsx.load(templateFileData.value)
   const worksheet = workbook.getWorksheet('模板')
   for (let [key, value] of Object.entries(info.value.packageData)) {
     const newWorksheet = workbook.addWorksheet(key);
@@ -232,7 +237,25 @@ const downloadFile = async (workbook) => {
 
 <template>
 <div>
-  请选择信息表：<input type="file" @change="uploadFile">
-  请选择技术评分表：<input type="file" @change="uploadScoringFile">
+  <div>
+    <label class="label">
+      请选择信息表：
+    </label>
+    <input type="file" @change="uploadFile">
+  </div>
+  <div>
+    <label class="label">
+      请选择技术评分表：
+    </label>
+    <input type="file" @change="uploadScoringFile">
+  </div>
 </div>
 </template>
+<style scoped>
+.label {
+  display: inline-block;
+  width: 160px;
+  text-align:right;
+  margin-bottom: 8px;
+}
+</style>
