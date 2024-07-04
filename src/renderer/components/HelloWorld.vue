@@ -49,6 +49,7 @@ const excelColumnName = (index) => {
     }
     return columnName || undefined;
 }
+
 /**
  * 读取信息表：获取项目名称、项目编号、包号、设备名称、投标公司名称
  */
@@ -106,22 +107,24 @@ const getProjectInfo = (value) => {
     projectCode
   }
 }
-// 读取评分表
+// 读取评分表模板
 const uploadScoringFile = async (e) => {
   const data = await e.target.files[0].arrayBuffer()
   const workbook = new Excel.Workbook()
   await workbook.xlsx.load(data)
-  const worksheet = workbook.getWorksheet('1')
-  
+  const worksheet = workbook.getWorksheet('模板')
   for (let [key, value] of Object.entries(info.value.packageData)) {
     const newWorksheet = workbook.addWorksheet(key);
     worksheet?.eachRow({ includeEmpty: true }, function(row, rowNumber) {
-      // const { number } = worksheet.lastRow 
+      // 先复制模板
       row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
           const newCell = newWorksheet.getCell(rowNumber, colNumber);
           newCell.value = cell.value;
           if (cell.style) {
               newCell.style = { ...cell.style };
+          }
+          if ([2, 3].includes(colNumber)) {
+            newCell._column.width = 16
           }
       });
 
@@ -133,7 +136,7 @@ const uploadScoringFile = async (e) => {
         }
         if (newRowNumber === 2) {
           newRow.height = 30
-          newRow.alignment = { horizontal: 'left' }
+          newRow.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true  }
           const cell2 = newRow.getCell(1)
           cell2.value = `项目名称：${info.value.projectName}\n项目编号：${info.value.projectCode}-${key}`
         }
@@ -148,14 +151,13 @@ const uploadScoringFile = async (e) => {
     });
   }
   
-  workbook.removeWorksheet('1')
+  workbook.removeWorksheet('模板')
   // 文件下载
   downloadFile(workbook)
   
 }
 // 处理行以及单元格
 const handleRow = ({ worksheet, row, rowIndex = 1, companyList, deviceName } = {} ) => {
-  
   // 设置设备名称
   if (rowIndex === 1) {
     row.getCell(1).value = `${deviceName} 技术评分表`
@@ -176,7 +178,10 @@ const handleRow = ({ worksheet, row, rowIndex = 1, companyList, deviceName } = {
       newCell.value = {
         formula: `SUM(${columnName}${START_SUM_ROW}:${columnName}${rowIndex - 1})`
       }
-      // newCell.result = 0
+      worksheet.unMergeCells('A14')
+      worksheet.mergeCells('A14:B14')
+      worksheet.unMergeCells('C14')
+      worksheet.mergeCells('C14:D14')
     } else {
       if (isNumberRow) {
         newCell.value = item
@@ -196,14 +201,16 @@ const handleRow = ({ worksheet, row, rowIndex = 1, companyList, deviceName } = {
     }
     // 设置单元格样式
     newCell.style = CELL_STYLE
-    // 设置单元格宽度
+    // // 设置单元格宽度
     newCell._column.width = 20
 
     if (rowIndex === 5) {
       worksheet.mergeCells(rowIndex, columnCount + 1 + index , rowIndex - 1, columnCount + 1 + index)
     }
   })
-
+  if (rowIndex === 3) {
+    worksheet.mergeCells(rowIndex, 3 ,rowIndex, 2)
+  }
   // 处理第一行与第二行需要所有单元格合并
   const isMergeRow = [1, 2].includes(rowIndex)
   if (!isMergeRow) {
@@ -219,7 +226,7 @@ const downloadFile = async (workbook) => {
   const buffer = await workbook.xlsx.writeBuffer()
   fileSaver(new Blob([buffer], {
     type: 'application/octet-stream'
-  }), 'aaa.xlsx')
+  }), '评分表.xlsx')
 }
 </script>
 
