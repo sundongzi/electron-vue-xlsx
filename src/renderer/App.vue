@@ -5,7 +5,7 @@ window.electronAPI.sendMessage('Hello from App.vue!');
 </script>
 
 <template>
-  <HelloWorld msg="Vite + Vue" />
+  <HelloWorld/>
 </template>
 
 <style scoped>

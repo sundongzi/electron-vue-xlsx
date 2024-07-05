@@ -87,7 +87,7 @@ const uploadFile = async (e) => {
       if (!info.value.packageData[packageNumber]) {
         info.value.packageData[packageNumber] = {
           deviceName: row.values[2],
-          corporateNameList: []
+          corporateNameList: [row.values[4]]
         }
       } else {
         info.value.packageData[row.values[1]].corporateNameList.push(row.values[4])
@@ -129,7 +129,7 @@ const uploadScoringFile = async (e) => {
               newCell.style = { ...cell.style };
           }
           if ([2, 3].includes(colNumber)) {
-            newCell._column.width = 16
+            newCell._column.width = 22
           }
       });
 
@@ -210,6 +210,10 @@ const handleRow = ({ worksheet, row, rowIndex = 1, companyList, deviceName } = {
     newCell._column.width = 20
 
     if (rowIndex === 5) {
+      worksheet.unMergeCells('A4')
+      worksheet.mergeCells('A4:A5')
+      worksheet.unMergeCells('B4')
+      worksheet.mergeCells('B4:B5')
       worksheet.mergeCells(rowIndex, columnCount + 1 + index , rowIndex - 1, columnCount + 1 + index)
     }
   })

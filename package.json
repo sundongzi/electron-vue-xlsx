@@ -1,5 +1,5 @@
 {
-  "name": "electron-vue-template",
+  "name": "technical-score",
   "version": "0.1.0",
   "description": "A minimal Electron + Vue application",
   "main": "main/main.js",
@@ -22,8 +22,6 @@
     "electron": "^27.1.0",
     "electron-builder": "^24.2.1",
     "typescript": "^5.2.2",
-    "unplugin-auto-import": "^0.17.6",
-    "unplugin-vue-components": "^0.27.2",
     "vite": "^4.5.0"
   },
   "dependencies": {
